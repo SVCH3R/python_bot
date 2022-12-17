@@ -4,16 +4,30 @@ import json
 import base64
 import os
 import random
+import configparser
 
 
 def main():
-    # создание бота
-    bot = telebot.TeleBot('5986422827:AAHFrghmosOVJM8NAQIfE0EejdpFFizPb6o')
+
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    token = config["token"]["token"]
+    print(token)
+    bot = telebot.TeleBot(token)
 
     @bot.message_handler(commands=["start"])
     def start(m, res=False):
-        bot.send_message(m.chat.id, 'отправь текст, я отправлю картинку :)')
-    # обработка сообщения
+        bot.send_message(m.chat.id, 'напишите /help')
+
+    @bot.message_handler(commands=["help"])
+    def help(m, res=False):
+        bot.send_message(
+            m.chat.id, 'Бот генерирует изображения на основе введенного текста. Просто отправьте текст (желательно на английском языке) \n подробнее /info')
+
+    @bot.message_handler(commands=["info"])
+    def info(m, res=False):
+        bot.send_message(
+            m.chat.id, 'оригинальный сайт: https://www.craiyon.com/ \n про нейросеть DALL-E https://en.wikipedia.org/wiki/DALL-E')
 
     @bot.message_handler(content_types=["text"])
     def handle_text(message):
@@ -55,7 +69,7 @@ def main():
         # удаляем изображения
         for i in images:
             os.remove(i)
-    # запускаем бота
+    # запускаем
     bot.polling(none_stop=True, interval=0)
 
 
